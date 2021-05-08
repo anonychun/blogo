@@ -1,0 +1,569 @@
+basePath: /v1
+definitions:
+  model.AccountCreateRequest:
+    properties:
+      email:
+        type: string
+      name:
+        type: string
+      password:
+        type: string
+    required:
+    - email
+    - name
+    - password
+    type: object
+  model.AccountPasswordUpdateRequest:
+    properties:
+      new_password:
+        type: string
+      old_password:
+        type: string
+    required:
+    - new_password
+    - old_password
+    type: object
+  model.AccountResponse:
+    properties:
+      created_at:
+        type: string
+      email:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  model.AccountUpdateRequest:
+    properties:
+      email:
+        type: string
+      name:
+        type: string
+    required:
+    - email
+    - name
+    type: object
+  model.AuthRequest:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    required:
+    - email
+    - password
+    type: object
+  model.AuthResponse:
+    properties:
+      token:
+        type: string
+    type: object
+  model.ErrorResponse:
+    properties:
+      message:
+        type: string
+    type: object
+  model.PostCreateRequest:
+    properties:
+      body:
+        type: string
+      title:
+        type: string
+    required:
+    - body
+    - title
+    type: object
+  model.PostResponse:
+    properties:
+      account:
+        $ref: '#/definitions/model.AccountResponse'
+      account_id:
+        type: integer
+      body:
+        type: string
+      created_at:
+        type: string
+      id:
+        type: integer
+      title:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  model.PostUpdateRequest:
+    properties:
+      body:
+        type: string
+      title:
+        type: string
+    required:
+    - body
+    - title
+    type: object
+info:
+  contact: {}
+  description: Implementing back-end services for blog application
+  title: Go Blog API
+  version: "1.0"
+paths:
+  /accounts:
+    get:
+      description: TODO
+      parameters:
+      - description: pagination limit
+        in: query
+        name: limit
+        type: integer
+      - description: pagination offset
+        in: query
+        name: offset
+        type: integer
+      - description: account name
+        in: query
+        name: name
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/model.AccountResponse'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      summary: List accounts
+      tags:
+      - accounts
+    post:
+      consumes:
+      - application/json
+      description: TODO
+      parameters:
+      - description: body request
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/model.AccountCreateRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/model.AccountResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      summary: Create account
+      tags:
+      - accounts
+  /accounts/{account_id}:
+    delete:
+      description: TODO
+      parameters:
+      - description: account id
+        format: int64
+        in: path
+        name: account_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: ""
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Delete account
+      tags:
+      - accounts
+    get:
+      consumes:
+      - application/json
+      description: TODO
+      parameters:
+      - description: account id
+        format: int64
+        in: path
+        name: account_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.AccountResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      summary: Get account
+      tags:
+      - accounts
+    put:
+      consumes:
+      - application/json
+      description: TODO
+      parameters:
+      - description: account id
+        format: int64
+        in: path
+        name: account_id
+        required: true
+        type: integer
+      - description: body request
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/model.AccountUpdateRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.AccountResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Update account
+      tags:
+      - accounts
+  /accounts/{account_id}/password:
+    put:
+      consumes:
+      - application/json
+      description: TODO
+      parameters:
+      - description: account id
+        format: int64
+        in: path
+        name: account_id
+        required: true
+        type: integer
+      - description: body request
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/model.AccountPasswordUpdateRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.AccountResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Update account password
+      tags:
+      - accounts
+  /accounts/auth:
+    post:
+      consumes:
+      - application/json
+      description: TODO
+      parameters:
+      - description: body request
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/model.AuthRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.AuthResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      summary: Login account
+      tags:
+      - auth
+  /posts:
+    get:
+      description: TODO
+      parameters:
+      - description: pagination limit
+        in: query
+        name: limit
+        type: integer
+      - description: pagination offset
+        in: query
+        name: offset
+        type: integer
+      - description: post title
+        in: query
+        name: title
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/model.PostResponse'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      summary: List posts
+      tags:
+      - posts
+    post:
+      consumes:
+      - application/json
+      description: TODO
+      parameters:
+      - description: body request
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/model.PostCreateRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/model.PostResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Create post
+      tags:
+      - posts
+  /posts/{post_id}:
+    delete:
+      description: TODO
+      parameters:
+      - description: post id
+        format: int64
+        in: path
+        name: post_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: ""
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Delete post
+      tags:
+      - posts
+    get:
+      consumes:
+      - application/json
+      description: TODO
+      parameters:
+      - description: post id
+        format: int64
+        in: path
+        name: post_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.PostResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      summary: Get post
+      tags:
+      - posts
+    put:
+      consumes:
+      - application/json
+      description: TODO
+      parameters:
+      - description: post id
+        format: int64
+        in: path
+        name: post_id
+        required: true
+        type: integer
+      - description: body request
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/model.PostUpdateRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.PostResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Update post
+      tags:
+      - posts
+securityDefinitions:
+  ApiKeyAuth:
+    in: header
+    name: X-API-Key
+    type: apiKey
+swagger: "2.0"

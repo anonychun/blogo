@@ -1,0 +1,8 @@
+CREATE TABLE IF NOT EXISTS `post` (
+    `id` BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    `title` VARCHAR(255) NOT NULL,
+    `body` TEXT NOT NULL,
+    `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP(),
+    `updated_at` DATETIME,
+    `account_id` BIGINT NOT NULL REFERENCES account(id)
+);
