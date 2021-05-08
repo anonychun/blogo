@@ -37,57 +37,57 @@ This project using `Clean Architecture` with 4 domain layers:
 
 Setting up all containers
 
-```
-make compose.up
+```console
+$ make compose.up
 ```
 
 Applying all up migrations and start the server
 
-```
-make launch
+```console
+$ make launch
 ```
 
 ## Destroy
 
 Applying all down migrations
 
-```
-make rollbacks
+```console
+$ make rollbacks
 ```
 
 Destroy running containers
 
-```
-make compose.down
+```console
+$ make compose.down
 ```
 
 Delete all volumes that doesn't used
 
-```
-docker volume prune
+```console
+$ docker volume prune
 ```
 
 ## Environment Variables
 
 | **Key**                 | **Type** | **Value (Example)** |
-| :---------------------- | :------- | ------------------: |
-| APP_PORT                | int      |                1401 |
-| HTTP_RATE_LIMIT_REQUEST | int      |                 100 |
-| HTTP_RATE_LIMIT_TIME    | duration |                  1s |
-| JWT_SECRET_KEY          | string   |         go_blog_api |
-| JWT_TTL                 | duration |                 48h |
-| PAGINATION_LIMIT        | int      |                 100 |
-| MYSQL_USER              | string   |         go_blog_api |
-| MYSQL_PASSWORD          | string   |         go_blog_api |
-| MYSQL_HOST              | string   |           localhost |
-| MYSQL_PORT              | int      |                3306 |
-| MYSQL_DATABASE          | string   |         go_blog_api |
-| MYSQL_MAX_IDLE_CONNS    | int      |                   5 |
-| MYSQL_MAX_OPEN_CONNS    | int      |                  10 |
-| MYSQL_CONN_MAX_LIFETIME | duration |                 30m |
-| REDIS_PASSWORD          | string   |         go_blog_api |
-| REDIS_HOST              | string   |           localhost |
-| REDIS_PORT              | int      |                6379 |
-| REDIS_DATABASE          | int      |                   0 |
-| REDIS_POOL_SIZE         | int      |                  10 |
-| REDIS_TTL               | duration |                  1h |
+| :---------------------- | :------- | :------------------ |
+| APP_PORT                | int      | 1401                |
+| HTTP_RATE_LIMIT_REQUEST | int      | 100                 |
+| HTTP_RATE_LIMIT_TIME    | duration | 1s                  |
+| JWT_SECRET_KEY          | string   | secret              |
+| JWT_TTL                 | duration | 48h                 |
+| PAGINATION_LIMIT        | int      | 100                 |
+| MYSQL_USER              | string   | admin               |
+| MYSQL_PASSWORD          | string   | secret              |
+| MYSQL_HOST              | string   | localhost           |
+| MYSQL_PORT              | int      | 3306                |
+| MYSQL_DATABASE          | string   | test                |
+| MYSQL_MAX_IDLE_CONNS    | int      | 5                   |
+| MYSQL_MAX_OPEN_CONNS    | int      | 10                  |
+| MYSQL_CONN_MAX_LIFETIME | duration | 30m                 |
+| REDIS_PASSWORD          | string   | secret              |
+| REDIS_HOST              | string   | localhost           |
+| REDIS_PORT              | int      | 6379                |
+| REDIS_DATABASE          | int      | 0                   |
+| REDIS_POOL_SIZE         | int      | 10                  |
+| REDIS_TTL               | duration | 1h                  |
