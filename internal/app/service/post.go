@@ -29,15 +29,16 @@ type postService struct {
 }
 
 func (s *postService) Create(ctx context.Context, req model.PostCreateRequest) (*model.PostResponse, error) {
+	claimsID, valid := middleware.GetClaimsID(ctx)
+	if !valid {
+		return nil, constant.ErrUnauthorized
+	}
+
 	post := &model.Post{
 		Title:     req.Title,
 		Body:      req.Body,
 		CreatedAt: time.Now(),
-		AccountID: ctx.Value("account_id").(int64),
-	}
-
-	if !middleware.IsMe(ctx, post.AccountID) {
-		return nil, constant.ErrUnauthorized
+		AccountID: claimsID,
 	}
 
 	err := s.postRepository.Create(ctx, post)

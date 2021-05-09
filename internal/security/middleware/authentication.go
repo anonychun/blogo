@@ -39,9 +39,6 @@ func JWTVerifier(next http.Handler) http.Handler {
 			return
 		}
 
-		r = r.WithContext(context.WithValue(r.Context(), "claims", claims))
-		r = r.WithContext(context.WithValue(r.Context(), "account_id", claimsID))
-
-		next.ServeHTTP(w, r)
+		next.ServeHTTP(w, r.WithContext(context.WithValue(r.Context(), claimsIDKey, claimsID)))
 	})
 }

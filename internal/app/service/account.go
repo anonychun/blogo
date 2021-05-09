@@ -89,7 +89,7 @@ func (s *accountService) Update(ctx context.Context, req model.AccountUpdateRequ
 	if err != nil && err != sql.ErrNoRows {
 		logger.Log().Err(err).Msg("failed to get account by email")
 		return nil, constant.ErrServer
-	} else if err == nil && account.ID != ctx.Value("account_id").(int64) {
+	} else if err == nil && account.ID != req.ID {
 		return nil, constant.ErrEmailRegistered
 	}
 
