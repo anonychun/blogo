@@ -1,7 +1,6 @@
 package config
 
 import (
-	"strings"
 	"time"
 
 	"github.com/spf13/viper"
@@ -37,30 +36,32 @@ type Config struct {
 
 func load() Config {
 	fang := viper.New()
-	fang.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
+	fang.SetConfigFile(".env")
+	fang.AddConfigPath(".")
 	fang.AutomaticEnv()
+	fang.ReadInConfig()
 
 	return Config{
-		AppPort:              fang.GetInt("app.port"),
-		HttpRateLimitRequest: fang.GetInt("http.rate.limit.request"),
-		HttpRateLimitTime:    fang.GetDuration("http.rate.limit.time"),
-		JwtSecretKey:         fang.GetString("jwt.secret.key"),
-		JwtTTL:               fang.GetDuration("jwt.ttl"),
-		PaginationLimit:      fang.GetInt("pagination.limit"),
-		MysqlUser:            fang.GetString("mysql.user"),
-		MysqlPassword:        fang.GetString("mysql.password"),
-		MysqlHost:            fang.GetString("mysql.host"),
-		MysqlPort:            fang.GetInt("mysql.port"),
-		MysqlDatabase:        fang.GetString("mysql.database"),
-		MysqlMaxIdleConns:    fang.GetInt("mysql.max.idle.conns"),
-		MysqlMaxOpenConns:    fang.GetInt("mysql.max.open.conns"),
-		MysqlConnMaxLifetime: fang.GetDuration("mysql.conn.max.lifetime"),
-		RedisPassword:        fang.GetString("redis.password"),
-		RedisHost:            fang.GetString("redis.host"),
-		RedisPort:            fang.GetInt("redis.port"),
-		RedisDatabase:        fang.GetInt("redis.database"),
-		RedisPoolSize:        fang.GetInt("redis.pool.size"),
-		RedisTTL:             fang.GetDuration("redis.ttl"),
+		AppPort:              fang.GetInt("APP_PORT"),
+		HttpRateLimitRequest: fang.GetInt("HTTP_RATE_LIMIT_REQUEST"),
+		HttpRateLimitTime:    fang.GetDuration("HTTP_RATE_LIMIT_TIME"),
+		JwtSecretKey:         fang.GetString("JWT_SECRET_KEY"),
+		JwtTTL:               fang.GetDuration("JWT_TTL"),
+		PaginationLimit:      fang.GetInt("PAGINATION_LIMIT"),
+		MysqlUser:            fang.GetString("MYSQL_USER"),
+		MysqlPassword:        fang.GetString("MYSQL_PASSWORD"),
+		MysqlHost:            fang.GetString("MYSQL_HOST"),
+		MysqlPort:            fang.GetInt("MYSQL_PORT"),
+		MysqlDatabase:        fang.GetString("MYSQL_DATABASE"),
+		MysqlMaxIdleConns:    fang.GetInt("MYSQL_MAX_IDLE_CONNS"),
+		MysqlMaxOpenConns:    fang.GetInt("MYSQL_MAX_OPEN_CONNS"),
+		MysqlConnMaxLifetime: fang.GetDuration("MYSQL_CONN_MAX_LIFETIME"),
+		RedisPassword:        fang.GetString("REDIS_PASSWORD"),
+		RedisHost:            fang.GetString("REDIS_HOST"),
+		RedisPort:            fang.GetInt("REDIS_PORT"),
+		RedisDatabase:        fang.GetInt("REDIS_DATABASE"),
+		RedisPoolSize:        fang.GetInt("REDIS_POOL_SIZE"),
+		RedisTTL:             fang.GetDuration("REDIS_TTL"),
 	}
 }
 
