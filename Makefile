@@ -4,6 +4,7 @@ SHELL := /bin/bash
 SRC_DIR := $(shell pwd)
 OUT_DIR := $(SRC_DIR)/_output
 BIN_DIR := $(OUT_DIR)/bin
+CONFIG_LOCATION := $(SRC_DIR)
 GO111MODULE := on
 
 include .env

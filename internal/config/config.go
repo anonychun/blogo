@@ -1,6 +1,7 @@
 package config
 
 import (
+	"os"
 	"time"
 
 	"github.com/spf13/viper"
@@ -36,8 +37,14 @@ type Config struct {
 
 func load() Config {
 	fang := viper.New()
+
 	fang.SetConfigFile(".env")
 	fang.AddConfigPath(".")
+	configLocation, available := os.LookupEnv("CONFIG_LOCATION")
+	if available {
+		fang.AddConfigPath(configLocation)
+	}
+
 	fang.AutomaticEnv()
 	fang.ReadInConfig()
 
