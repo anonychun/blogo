@@ -25,6 +25,15 @@ rollbacks:
 build:
 	go build -ldflags="-s -w" -o $(BIN_DIR)/server $(SRC_DIR)/main.go
 
+.PHONY: test
+test:
+	go test -v ./...
+
+.PHONY: test.nocache
+test.nocache:
+	go clean -testcache
+	go test -v ./...
+
 .PHONY: compose.up
 compose.up:
 	docker-compose up -d
