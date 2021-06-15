@@ -63,7 +63,13 @@ func (s *postService) List(ctx context.Context, req model.PostListRequest) ([]*m
 func (s *postService) Get(ctx context.Context, req model.PostGetRequest) (*model.PostResponse, error) {
 	post, err := s.postRepository.Get(ctx, req.ID)
 	if err != nil {
-		return nil, s.switchErrPostNotFoundOrErrServer(err)
+		logger.Log().Err(err).Msg("failed to get post")
+		switch err {
+		case sql.ErrNoRows:
+			return nil, constant.ErrPostNotFound
+		default:
+			return nil, constant.ErrServer
+		}
 	}
 
 	return model.NewPostResponse(post), nil
@@ -72,7 +78,13 @@ func (s *postService) Get(ctx context.Context, req model.PostGetRequest) (*model
 func (s *postService) Update(ctx context.Context, req model.PostUpdateRequest) (*model.PostResponse, error) {
 	post, err := s.postRepository.Get(ctx, req.ID)
 	if err != nil {
-		return nil, s.switchErrPostNotFoundOrErrServer(err)
+		logger.Log().Err(err).Msg("failed to get post")
+		switch err {
+		case sql.ErrNoRows:
+			return nil, constant.ErrPostNotFound
+		default:
+			return nil, constant.ErrServer
+		}
 	}
 
 	if !middleware.IsMe(ctx, post.AccountID) {
@@ -85,7 +97,13 @@ func (s *postService) Update(ctx context.Context, req model.PostUpdateRequest) (
 
 	err = s.postRepository.Update(ctx, post)
 	if err != nil {
-		return nil, s.switchErrPostNotFoundOrErrServer(err)
+		logger.Log().Err(err).Msg("failed to update post")
+		switch err {
+		case sql.ErrNoRows:
+			return nil, constant.ErrPostNotFound
+		default:
+			return nil, constant.ErrServer
+		}
 	}
 
 	return model.NewPostResponse(post), nil
@@ -94,7 +112,13 @@ func (s *postService) Update(ctx context.Context, req model.PostUpdateRequest) (
 func (s *postService) Delete(ctx context.Context, req model.PostDeleteRequest) error {
 	post, err := s.postRepository.Get(ctx, req.ID)
 	if err != nil {
-		return s.switchErrPostNotFoundOrErrServer(err)
+		logger.Log().Err(err).Msg("failed to get post")
+		switch err {
+		case sql.ErrNoRows:
+			return constant.ErrPostNotFound
+		default:
+			return constant.ErrServer
+		}
 	}
 
 	if !middleware.IsMe(ctx, post.AccountID) {
@@ -103,18 +127,9 @@ func (s *postService) Delete(ctx context.Context, req model.PostDeleteRequest) e
 
 	err = s.postRepository.Delete(ctx, req.ID)
 	if err != nil {
-		return s.switchErrPostNotFoundOrErrServer(err)
+		logger.Log().Err(err).Msg("failed to delete post")
+		return constant.ErrServer
 	}
 
 	return nil
-}
-
-func (s *postService) switchErrPostNotFoundOrErrServer(err error) error {
-	switch err {
-	case sql.ErrNoRows:
-		return constant.ErrPostNotFound
-	default:
-		logger.Log().Err(err).Msg("failed to execute operation post repository")
-		return constant.ErrServer
-	}
 }

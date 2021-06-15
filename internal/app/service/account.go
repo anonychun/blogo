@@ -74,7 +74,13 @@ func (s *accountService) List(ctx context.Context, req model.AccountListRequest)
 func (s *accountService) Get(ctx context.Context, req model.AccountGetRequest) (*model.AccountResponse, error) {
 	account, err := s.accountRepository.Get(ctx, req.ID)
 	if err != nil {
-		return nil, s.switchErrAccountNotFoundOrErrServer(err)
+		logger.Log().Err(err).Msg("failed to get account by id")
+		switch err {
+		case sql.ErrNoRows:
+			return nil, constant.ErrAccountNotFound
+		default:
+			return nil, constant.ErrServer
+		}
 	}
 
 	return model.NewAccountResponse(account), nil
@@ -95,7 +101,13 @@ func (s *accountService) Update(ctx context.Context, req model.AccountUpdateRequ
 
 	account, err = s.accountRepository.Get(ctx, req.ID)
 	if err != nil {
-		return nil, s.switchErrAccountNotFoundOrErrServer(err)
+		logger.Log().Err(err).Msg("failed to get account by id")
+		switch err {
+		case sql.ErrNoRows:
+			return nil, constant.ErrAccountNotFound
+		default:
+			return nil, constant.ErrServer
+		}
 	}
 
 	account.Name = req.Name
@@ -104,7 +116,8 @@ func (s *accountService) Update(ctx context.Context, req model.AccountUpdateRequ
 
 	err = s.accountRepository.Update(ctx, account)
 	if err != nil {
-		return nil, s.switchErrAccountNotFoundOrErrServer(err)
+		logger.Log().Err(err).Msg("failed to update account")
+		return nil, constant.ErrServer
 	}
 
 	return model.NewAccountResponse(account), nil
@@ -117,7 +130,13 @@ func (s *accountService) UpdatePassword(ctx context.Context, req model.AccountPa
 
 	account, err := s.accountRepository.Get(ctx, req.ID)
 	if err != nil {
-		return nil, s.switchErrAccountNotFoundOrErrServer(err)
+		logger.Log().Err(err).Msg("failed to get account by id")
+		switch err {
+		case sql.ErrNoRows:
+			return nil, constant.ErrAccountNotFound
+		default:
+			return nil, constant.ErrServer
+		}
 	}
 
 	err = bcrypt.CompareHashAndPassword([]byte(account.Password), []byte(req.OldPassword))
@@ -136,7 +155,8 @@ func (s *accountService) UpdatePassword(ctx context.Context, req model.AccountPa
 
 	err = s.accountRepository.Update(ctx, account)
 	if err != nil {
-		return nil, s.switchErrAccountNotFoundOrErrServer(err)
+		logger.Log().Err(err).Msg("failed to update account password")
+		return nil, constant.ErrServer
 	}
 
 	return model.NewAccountResponse(account), nil
@@ -149,18 +169,9 @@ func (s *accountService) Delete(ctx context.Context, req model.AccountDeleteRequ
 
 	err := s.accountRepository.Delete(ctx, req.ID)
 	if err != nil {
-		return s.switchErrAccountNotFoundOrErrServer(err)
+		logger.Log().Err(err).Msg("failed to delete account")
+		return constant.ErrServer
 	}
 
 	return nil
-}
-
-func (s *accountService) switchErrAccountNotFoundOrErrServer(err error) error {
-	switch err {
-	case sql.ErrNoRows:
-		return constant.ErrAccountNotFound
-	default:
-		logger.Log().Err(err).Msg("failed to execute operation account repository")
-		return constant.ErrServer
-	}
 }

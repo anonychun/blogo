@@ -27,11 +27,11 @@ type authService struct {
 func (s *authService) Login(ctx context.Context, req model.AuthRequest) (*model.AuthResponse, error) {
 	account, err := s.accountRepository.GetByEmail(ctx, req.Email)
 	if err != nil {
+		logger.Log().Err(err).Msg("failed to get account by email")
 		switch err {
 		case sql.ErrNoRows:
 			return nil, constant.ErrEmailNotRegistered
 		default:
-			logger.Log().Err(err).Msg("failed to get account by email")
 			return nil, constant.ErrServer
 		}
 	}
