@@ -6,8 +6,7 @@ import (
 
 	"github.com/anonychun/go-blog-api/internal/app/model"
 	"github.com/anonychun/go-blog-api/internal/config"
-	"github.com/anonychun/go-blog-api/internal/db/mysql"
-	"github.com/anonychun/go-blog-api/internal/db/redis"
+	"github.com/anonychun/go-blog-api/internal/db"
 	cache "github.com/go-redis/cache/v8"
 )
 
@@ -20,13 +19,13 @@ type AccountRepository interface {
 	Delete(ctx context.Context, id int64) error
 }
 
-func NewAccountRepository(mysqlClient mysql.Client, redisClient redis.Client) AccountRepository {
+func NewAccountRepository(mysqlClient db.MysqlClient, redisClient db.RedisClient) AccountRepository {
 	return &accountRepository{mysqlClient, redisClient}
 }
 
 type accountRepository struct {
-	mysqlClient mysql.Client
-	redisClient redis.Client
+	mysqlClient db.MysqlClient
+	redisClient db.RedisClient
 }
 
 func (r *accountRepository) Create(ctx context.Context, account *model.Account) error {

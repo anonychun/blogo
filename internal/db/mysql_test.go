@@ -1,4 +1,4 @@
-package mysql
+package db
 
 import (
 	"testing"
@@ -7,8 +7,8 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestClient(t *testing.T) {
-	c, err := NewClient()
+func TestMysqlClient(t *testing.T) {
+	c, err := NewMysqlClient()
 	require.NoError(t, err)
 	require.NotNil(t, c)
 
@@ -16,7 +16,7 @@ func TestClient(t *testing.T) {
 		assert.NotNil(t, c.Conn())
 	})
 
-	t.Run("close conn", func(t *testing.T) {
+	t.Run("close", func(t *testing.T) {
 		assert.NoError(t, c.Close())
 	})
 }

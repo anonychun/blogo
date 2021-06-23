@@ -6,8 +6,7 @@ import (
 
 	"github.com/anonychun/go-blog-api/internal/app/model"
 	"github.com/anonychun/go-blog-api/internal/config"
-	"github.com/anonychun/go-blog-api/internal/db/mysql"
-	"github.com/anonychun/go-blog-api/internal/db/redis"
+	"github.com/anonychun/go-blog-api/internal/db"
 	cache "github.com/go-redis/cache/v8"
 )
 
@@ -19,13 +18,13 @@ type PostRepository interface {
 	Delete(ctx context.Context, id int64) error
 }
 
-func NewPostRepository(mysqlClient mysql.Client, redisClient redis.Client) PostRepository {
+func NewPostRepository(mysqlClient db.MysqlClient, redisClient db.RedisClient) PostRepository {
 	return &postRepository{mysqlClient, redisClient}
 }
 
 type postRepository struct {
-	mysqlClient mysql.Client
-	redisClient redis.Client
+	mysqlClient db.MysqlClient
+	redisClient db.RedisClient
 }
 
 func (r *postRepository) Create(ctx context.Context, post *model.Post) error {

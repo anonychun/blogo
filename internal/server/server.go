@@ -9,19 +9,18 @@ import (
 	"syscall"
 
 	"github.com/anonychun/go-blog-api/internal/config"
-	"github.com/anonychun/go-blog-api/internal/db/mysql"
-	"github.com/anonychun/go-blog-api/internal/db/redis"
+	"github.com/anonychun/go-blog-api/internal/db"
 	"github.com/anonychun/go-blog-api/internal/logger"
 )
 
 func Start() error {
-	mysqlClient, err := mysql.NewClient()
+	mysqlClient, err := db.NewMysqlClient()
 	if err != nil {
 		return err
 	}
 	defer mysqlClient.Close()
 
-	redisClient, err := redis.NewClient()
+	redisClient, err := db.NewRedisClient()
 	if err != nil {
 		return err
 	}
