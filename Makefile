@@ -12,19 +12,19 @@ export $(shell sed 's/=.*//' .env)
 
 .PHONY: launch
 launch:
-	go run $(SRC_DIR)/main.go launch
+	go run $(SRC_DIR)/cmd/server/main.go launch
 
 .PHONY: migrations
 migrations:
-	go run $(SRC_DIR)/main.go migrations
+	go run $(SRC_DIR)/cmd/server/main.go migrations
 
 .PHONY: rollbacks
 rollbacks:
-	go run $(SRC_DIR)/main.go rollbacks
+	go run $(SRC_DIR)/cmd/server/main.go rollbacks
 
 .PHONY: build
 build:
-	go build -ldflags="-s -w" -o $(BIN_DIR)/server $(SRC_DIR)/main.go
+	go build -ldflags="-s -w" -o $(BIN_DIR)/server $(SRC_DIR)/cmd/server/main.go
 
 .PHONY: test
 test:

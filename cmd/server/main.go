@@ -1,4 +1,4 @@
-package cmd
+package main
 
 import (
 	"os"
@@ -9,7 +9,7 @@ import (
 	cli "github.com/urfave/cli/v2"
 )
 
-func ExecuteServer() error {
+func main() {
 	app := cli.NewApp()
 	app.Name = "Go Blog API"
 	app.Description = "Implementing back-end services for blog application"
@@ -19,24 +19,14 @@ func ExecuteServer() error {
 			Name:        "migrations",
 			Description: "migrations looks at the currently active migration version and will migrate all the way up (applying all up migrations)",
 			Action: func(c *cli.Context) error {
-				err := migration.Up()
-				if err != nil {
-					return err
-				}
-				logger.Log().Info().Msg("migrations successful")
-				return nil
+				return migration.Up()
 			},
 		},
 		{
 			Name:        "rollbacks",
 			Description: "rollbacks looks at the currently active migration version and will migrate all the way down (applying all down migrations)",
 			Action: func(c *cli.Context) error {
-				err := migration.Down()
-				if err != nil {
-					return err
-				}
-				logger.Log().Info().Msg("rollbacks successful")
-				return nil
+				return migration.Down()
 			},
 		},
 		{
@@ -46,24 +36,14 @@ func ExecuteServer() error {
 				&cli.IntFlag{Name: "n"},
 			},
 			Action: func(c *cli.Context) error {
-				err := migration.Steps(c.Int("n"))
-				if err != nil {
-					return err
-				}
-				logger.Log().Info().Msgf("steps %d successful", c.Int("n"))
-				return nil
+				return migration.Steps(c.Int("n"))
 			},
 		},
 		{
 			Name:        "drop",
 			Description: "drop deletes everything in the database",
 			Action: func(c *cli.Context) error {
-				err := migration.Drop()
-				if err != nil {
-					return err
-				}
-				logger.Log().Info().Msg("drop successful")
-				return nil
+				return migration.Drop()
 			},
 		},
 		{
@@ -86,5 +66,8 @@ func ExecuteServer() error {
 		},
 	}
 
-	return app.Run(os.Args)
+	err := app.Run(os.Args)
+	if err != nil {
+		logger.Log().Fatal().Err(err).Msg("failed to run server")
+	}
 }
