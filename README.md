@@ -81,7 +81,7 @@ $ docker volume prune
 | MYSQL_PASSWORD          | string   | secret              |
 | MYSQL_HOST              | string   | localhost           |
 | MYSQL_PORT              | int      | 3306                |
-| MYSQL_DATABASE          | string   | test                |
+| MYSQL_DATABASE          | string   | blog                |
 | MYSQL_MAX_IDLE_CONNS    | int      | 5                   |
 | MYSQL_MAX_OPEN_CONNS    | int      | 10                  |
 | MYSQL_CONN_MAX_LIFETIME | duration | 30m                 |
