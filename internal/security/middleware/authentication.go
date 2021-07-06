@@ -9,7 +9,7 @@ import (
 	"github.com/anonychun/go-blog-api/internal/config"
 	"github.com/anonychun/go-blog-api/internal/constant"
 	"github.com/anonychun/go-blog-api/internal/web"
-	jwt "github.com/dgrijalva/jwt-go"
+	"github.com/golang-jwt/jwt"
 )
 
 func JWTVerifier(next http.Handler) http.Handler {

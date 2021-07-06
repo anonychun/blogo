@@ -3,7 +3,6 @@ module github.com/anonychun/go-blog-api
 go 1.16
 
 require (
-	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/go-chi/chi v4.0.2+incompatible
 	github.com/go-chi/cors v1.2.0
 	github.com/go-chi/httprate v0.4.0
@@ -12,6 +11,7 @@ require (
 	github.com/go-redis/cache/v8 v8.4.0
 	github.com/go-redis/redis/v8 v8.8.2
 	github.com/go-sql-driver/mysql v1.6.0
+	github.com/golang-jwt/jwt v3.2.1+incompatible
 	github.com/golang-migrate/migrate/v4 v4.14.1
 	github.com/leodido/go-urn v1.2.1 // indirect
 	github.com/rs/zerolog v1.21.0

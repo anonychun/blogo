@@ -4,7 +4,7 @@ import (
 	"time"
 
 	"github.com/anonychun/go-blog-api/internal/config"
-	jwt "github.com/dgrijalva/jwt-go"
+	"github.com/golang-jwt/jwt"
 )
 
 type Generator interface {

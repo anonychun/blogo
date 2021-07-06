@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"time"
 
-	jwt "github.com/dgrijalva/jwt-go"
+	"github.com/golang-jwt/jwt"
 )
 
 type Account struct {
