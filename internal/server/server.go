@@ -9,18 +9,19 @@ import (
 	"syscall"
 
 	"github.com/anonychun/go-blog-api/internal/config"
-	"github.com/anonychun/go-blog-api/internal/db"
+	"github.com/anonychun/go-blog-api/internal/db/postgres"
+	"github.com/anonychun/go-blog-api/internal/db/redis"
 	"github.com/anonychun/go-blog-api/internal/logger"
 )
 
 func Start() error {
-	postgresClient, err := db.NewPostgresClient()
+	postgresClient, err := postgres.NewClient()
 	if err != nil {
 		return err
 	}
 	defer postgresClient.Close()
 
-	redisClient, err := db.NewRedisClient()
+	redisClient, err := redis.NewClient()
 	if err != nil {
 		return err
 	}

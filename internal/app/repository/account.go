@@ -6,7 +6,8 @@ import (
 
 	"github.com/anonychun/go-blog-api/internal/app/model"
 	"github.com/anonychun/go-blog-api/internal/config"
-	"github.com/anonychun/go-blog-api/internal/db"
+	"github.com/anonychun/go-blog-api/internal/db/postgres"
+	"github.com/anonychun/go-blog-api/internal/db/redis"
 	cache "github.com/go-redis/cache/v8"
 )
 
@@ -19,13 +20,13 @@ type AccountRepository interface {
 	Delete(ctx context.Context, id int64) error
 }
 
-func NewAccountRepository(postgresClient db.PostgresClient, redisClient db.RedisClient) AccountRepository {
+func NewAccountRepository(postgresClient postgres.Client, redisClient redis.Client) AccountRepository {
 	return &accountRepository{postgresClient, redisClient}
 }
 
 type accountRepository struct {
-	postgresClient db.PostgresClient
-	redisClient    db.RedisClient
+	postgresClient postgres.Client
+	redisClient    redis.Client
 }
 
 func (r *accountRepository) Create(ctx context.Context, account *model.Account) error {
@@ -43,7 +44,6 @@ func (r *accountRepository) Create(ctx context.Context, account *model.Account) 
 		account.Password,
 	).Scan(
 		&account.ID)
-
 	if err != nil {
 		return err
 	}

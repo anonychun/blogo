@@ -1,4 +1,4 @@
-package db
+package redis
 
 import (
 	"context"
@@ -10,13 +10,13 @@ import (
 	redis "github.com/go-redis/redis/v8"
 )
 
-type RedisClient interface {
+type Client interface {
 	Conn() *redis.Client
 	Cache() *cache.Cache
 	Close() error
 }
 
-func NewRedisClient() (RedisClient, error) {
+func NewClientContext(ctx context.Context) (Client, error) {
 	db := redis.NewClient(&redis.Options{
 		Addr: fmt.Sprintf("%s:%d",
 			config.Cfg().RedisHost, config.Cfg().RedisPort,
@@ -26,7 +26,7 @@ func NewRedisClient() (RedisClient, error) {
 		PoolSize: config.Cfg().RedisPoolSize,
 	})
 
-	err := db.Ping(context.Background()).Err()
+	err := db.Ping(ctx).Err()
 	if err != nil {
 		return nil, err
 	}
@@ -36,14 +36,18 @@ func NewRedisClient() (RedisClient, error) {
 		LocalCache: cache.NewTinyLFU(1000, time.Minute),
 	})
 
-	return &redisClient{db, cacher}, nil
+	return &client{db, cacher}, nil
 }
 
-type redisClient struct {
+func NewClient() (Client, error) {
+	return NewClientContext(context.Background())
+}
+
+type client struct {
 	db     *redis.Client
 	cacher *cache.Cache
 }
 
-func (c *redisClient) Conn() *redis.Client { return c.db }
-func (c *redisClient) Cache() *cache.Cache { return c.cacher }
-func (c *redisClient) Close() error        { return c.db.Close() }
+func (c *client) Conn() *redis.Client { return c.db }
+func (c *client) Cache() *cache.Cache { return c.cacher }
+func (c *client) Close() error        { return c.db.Close() }

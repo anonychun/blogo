@@ -6,7 +6,8 @@ import (
 
 	"github.com/anonychun/go-blog-api/internal/app/model"
 	"github.com/anonychun/go-blog-api/internal/config"
-	"github.com/anonychun/go-blog-api/internal/db"
+	"github.com/anonychun/go-blog-api/internal/db/postgres"
+	"github.com/anonychun/go-blog-api/internal/db/redis"
 	cache "github.com/go-redis/cache/v8"
 )
 
@@ -18,13 +19,13 @@ type PostRepository interface {
 	Delete(ctx context.Context, id int64) error
 }
 
-func NewPostRepository(postgresClient db.PostgresClient, redisClient db.RedisClient) PostRepository {
+func NewPostRepository(postgresClient postgres.Client, redisClient redis.Client) PostRepository {
 	return &postRepository{postgresClient, redisClient}
 }
 
 type postRepository struct {
-	postgresClient db.PostgresClient
-	redisClient    db.RedisClient
+	postgresClient postgres.Client
+	redisClient    redis.Client
 }
 
 func (r *postRepository) Create(ctx context.Context, post *model.Post) error {

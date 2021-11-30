@@ -1,4 +1,4 @@
-package db
+package redis
 
 import (
 	"testing"
@@ -7,13 +7,17 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestPostgresClient(t *testing.T) {
-	c, err := NewPostgresClient()
+func TestRedisClient(t *testing.T) {
+	c, err := NewClient()
 	require.NoError(t, err)
 	require.NotNil(t, c)
 
 	t.Run("get conn", func(t *testing.T) {
 		assert.NotNil(t, c.Conn())
+	})
+
+	t.Run("get cache", func(t *testing.T) {
+		assert.NotNil(t, c.Cache())
 	})
 
 	t.Run("close", func(t *testing.T) {

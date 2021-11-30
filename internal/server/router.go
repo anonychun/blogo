@@ -8,7 +8,8 @@ import (
 	"github.com/anonychun/go-blog-api/internal/app/repository"
 	"github.com/anonychun/go-blog-api/internal/app/service"
 	"github.com/anonychun/go-blog-api/internal/config"
-	"github.com/anonychun/go-blog-api/internal/db"
+	"github.com/anonychun/go-blog-api/internal/db/postgres"
+	"github.com/anonychun/go-blog-api/internal/db/redis"
 	"github.com/anonychun/go-blog-api/internal/security/middleware"
 	"github.com/go-chi/chi"
 	chimiddleware "github.com/go-chi/chi/middleware"
@@ -25,7 +26,7 @@ import (
 // @securityDefinitions.apikey ApiKeyAuth
 // @in header
 // @name X-API-Key
-func NewRouter(postgresClient db.PostgresClient, redisClient db.RedisClient) *chi.Mux {
+func NewRouter(postgresClient postgres.Client, redisClient redis.Client) *chi.Mux {
 	router := chi.NewRouter()
 
 	router.Use(httprate.LimitByIP(

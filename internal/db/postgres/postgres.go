@@ -1,4 +1,4 @@
-package db
+package postgres
 
 import (
 	"context"
@@ -8,12 +8,12 @@ import (
 	pgx "github.com/jackc/pgx/v4"
 )
 
-type PostgresClient interface {
+type Client interface {
 	Conn() *pgx.Conn
 	Close() error
 }
 
-func NewPostgresClientContext(ctx context.Context) (PostgresClient, error) {
+func NewClientContext(ctx context.Context) (Client, error) {
 	dataSourceName := fmt.Sprintf("postgres://%s:%s@%s:%d/%s?sslmode=disable",
 		config.Cfg().PostgresUser,
 		config.Cfg().PostgresPassword,
@@ -32,16 +32,16 @@ func NewPostgresClientContext(ctx context.Context) (PostgresClient, error) {
 		return nil, err
 	}
 
-	return &postgresClient{db}, nil
+	return &client{db}, nil
 }
 
-func NewPostgresClient() (PostgresClient, error) {
-	return NewPostgresClientContext(context.Background())
+func NewClient() (Client, error) {
+	return NewClientContext(context.Background())
 }
 
-type postgresClient struct {
+type client struct {
 	db *pgx.Conn
 }
 
-func (c *postgresClient) Conn() *pgx.Conn { return c.db }
-func (c *postgresClient) Close() error    { return c.db.Close(context.Background()) }
+func (c *client) Conn() *pgx.Conn { return c.db }
+func (c *client) Close() error    { return c.db.Close(context.Background()) }
