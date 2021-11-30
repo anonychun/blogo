@@ -5,24 +5,24 @@ import (
 
 	"github.com/anonychun/go-blog-api/internal/config"
 	migrate "github.com/golang-migrate/migrate/v4"
-	_ "github.com/golang-migrate/migrate/v4/database/mysql"
+	_ "github.com/golang-migrate/migrate/v4/database/postgres"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 )
 
-func getURL() (sourceURL string, databaseURL string) {
-	sourceURL = "file://./migrations"
-	databaseURL = fmt.Sprintf("mysql://%s:%s@tcp(%s:%d)/%s",
+func load() (*migrate.Migrate, error) {
+	sourceURL := "file://migrations"
+	databaseURL := fmt.Sprintf("postgres://%s:%s@%s:%d/%s?sslmode=disable",
 		config.Cfg().MysqlUser,
 		config.Cfg().MysqlPassword,
 		config.Cfg().MysqlHost,
 		config.Cfg().MysqlPort,
 		config.Cfg().MysqlDatabase,
 	)
-	return
+	return migrate.New(sourceURL, databaseURL)
 }
 
 func Up() error {
-	m, err := migrate.New(getURL())
+	m, err := load()
 	if err != nil {
 		return err
 	}
@@ -31,7 +31,7 @@ func Up() error {
 }
 
 func Down() error {
-	m, err := migrate.New(getURL())
+	m, err := load()
 	if err != nil {
 		return err
 	}
@@ -40,7 +40,7 @@ func Down() error {
 }
 
 func Steps(n int) error {
-	m, err := migrate.New(getURL())
+	m, err := load()
 	if err != nil {
 		return err
 	}
@@ -49,7 +49,7 @@ func Steps(n int) error {
 }
 
 func Drop() error {
-	m, err := migrate.New(getURL())
+	m, err := load()
 	if err != nil {
 		return err
 	}
