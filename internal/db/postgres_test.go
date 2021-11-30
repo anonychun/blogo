@@ -7,8 +7,8 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestMysqlClient(t *testing.T) {
-	c, err := NewMysqlClient()
+func TestPostgresClient(t *testing.T) {
+	c, err := NewPostgresClient()
 	require.NoError(t, err)
 	require.NotNil(t, c)
 

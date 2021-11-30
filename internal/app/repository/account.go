@@ -19,27 +19,31 @@ type AccountRepository interface {
 	Delete(ctx context.Context, id int64) error
 }
 
-func NewAccountRepository(mysqlClient db.MysqlClient, redisClient db.RedisClient) AccountRepository {
-	return &accountRepository{mysqlClient, redisClient}
+func NewAccountRepository(postgresClient db.PostgresClient, redisClient db.RedisClient) AccountRepository {
+	return &accountRepository{postgresClient, redisClient}
 }
 
 type accountRepository struct {
-	mysqlClient db.MysqlClient
-	redisClient db.RedisClient
+	postgresClient db.PostgresClient
+	redisClient    db.RedisClient
 }
 
 func (r *accountRepository) Create(ctx context.Context, account *model.Account) error {
-	res, err := r.mysqlClient.Conn().ExecContext(ctx, `
+	query := `
 	INSERT INTO
-		account (name, email, password, created_at)
+		account (name, email, password)
 	VALUES
-		(?, ?, ?, ?)
-	`, account.Name, account.Email, account.Password, account.CreatedAt)
-	if err != nil {
-		return err
-	}
+		($1, $2, $3)
+	RETURNING
+		id`
 
-	account.ID, err = res.LastInsertId()
+	err := r.postgresClient.Conn().QueryRow(ctx, query,
+		account.Name,
+		account.Email,
+		account.Password,
+	).Scan(
+		&account.ID)
+
 	if err != nil {
 		return err
 	}
@@ -50,22 +54,26 @@ func (r *accountRepository) Create(ctx context.Context, account *model.Account) 
 }
 
 func (r *accountRepository) List(ctx context.Context, limit, offset int, name string) ([]*model.Account, error) {
-	var accounts []*model.Account
-	rows, err := r.mysqlClient.Conn().QueryContext(ctx, `
+	query := `
 	SELECT
 		id, name, email, created_at, updated_at
 	FROM
 		account
 	WHERE
-		name LIKE ?
+		name LIKE $1
 	LIMIT
-		? OFFSET ?
-	`, "%"+name+"%", limit, offset)
+		$2 OFFSET $3`
+
+	rows, err := r.postgresClient.Conn().Query(ctx, query,
+		"%"+name+"%",
+		limit,
+		offset)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
 
+	var accounts []*model.Account
 	for rows.Next() {
 		account := new(model.Account)
 		err := rows.Scan(&account.ID, &account.Name, &account.Email, &account.CreatedAt, &account.UpdatedAt)
@@ -87,15 +95,20 @@ func (r *accountRepository) Get(ctx context.Context, id int64) (*model.Account, 
 		return account, nil
 	}
 
-	err = r.mysqlClient.Conn().QueryRowContext(ctx, `
+	query := `
 	SELECT
 		id, name, email, password, created_at, updated_at
 	FROM
 		account
 	WHERE
-		id = ?
-	`, id,
-	).Scan(&account.ID, &account.Name, &account.Email, &account.Password, &account.CreatedAt, &account.UpdatedAt)
+		id = $1`
+
+	err = r.postgresClient.Conn().QueryRow(ctx, query, id).Scan(
+		&account.ID,
+		&account.Name, &account.Email,
+		&account.Password,
+		&account.CreatedAt,
+		&account.UpdatedAt)
 	if err != nil {
 		return nil, err
 	}
@@ -117,15 +130,21 @@ func (r *accountRepository) GetByEmail(ctx context.Context, email string) (*mode
 		return account, nil
 	}
 
-	err = r.mysqlClient.Conn().QueryRowContext(ctx, `
+	query := `
 	SELECT
 		id, name, email, password, created_at, updated_at
 	FROM
 		account
 	WHERE
-		email = ?
-	`, email,
-	).Scan(&account.ID, &account.Name, &account.Email, &account.Password, &account.CreatedAt, &account.UpdatedAt)
+		email = $1`
+
+	err = r.postgresClient.Conn().QueryRow(ctx, query, email).Scan(
+		&account.ID,
+		&account.Name,
+		&account.Email,
+		&account.Password,
+		&account.CreatedAt,
+		&account.UpdatedAt)
 	if err != nil {
 		return nil, err
 	}
@@ -139,14 +158,20 @@ func (r *accountRepository) GetByEmail(ctx context.Context, email string) (*mode
 }
 
 func (r *accountRepository) Update(ctx context.Context, account *model.Account) error {
-	_, err := r.mysqlClient.Conn().ExecContext(ctx, `
+	query := `
 	UPDATE
 		account
 	SET
-		name = ?, email = ?, password = ?, updated_at = ?
+		name = $1, email = $2, password = $3, updated_at = $4
 	WHERE
-		id = ?
-	`, account.Name, account.Email, account.Password, account.UpdatedAt.Time, account.ID)
+		id = $5`
+
+	_, err := r.postgresClient.Conn().Exec(ctx, query,
+		account.Name,
+		account.Email,
+		account.Password,
+		account.UpdatedAt.Time,
+		account.ID)
 	if err != nil {
 		return err
 	}
@@ -162,12 +187,13 @@ func (r *accountRepository) Update(ctx context.Context, account *model.Account) 
 }
 
 func (r *accountRepository) Delete(ctx context.Context, id int64) error {
-	_, err := r.mysqlClient.Conn().ExecContext(ctx, `
+	query := `
 	DELETE FROM
 		account
 	WHERE
-		id = ?
-	`, id)
+		id = $1`
+
+	_, err := r.postgresClient.Conn().Exec(ctx, query, id)
 	if err != nil {
 		return err
 	}

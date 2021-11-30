@@ -2,13 +2,13 @@ package service
 
 import (
 	"context"
-	"database/sql"
 
 	"github.com/anonychun/go-blog-api/internal/app/model"
 	"github.com/anonychun/go-blog-api/internal/app/repository"
 	"github.com/anonychun/go-blog-api/internal/constant"
 	"github.com/anonychun/go-blog-api/internal/logger"
 	"github.com/anonychun/go-blog-api/internal/security/token"
+	pgx "github.com/jackc/pgx/v4"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -29,7 +29,7 @@ func (s *authService) Login(ctx context.Context, req model.AuthRequest) (*model.
 	if err != nil {
 		logger.Log().Err(err).Msg("failed to get account by email")
 		switch err {
-		case sql.ErrNoRows:
+		case pgx.ErrNoRows:
 			return nil, constant.ErrEmailNotRegistered
 		default:
 			return nil, constant.ErrServer

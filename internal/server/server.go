@@ -14,11 +14,11 @@ import (
 )
 
 func Start() error {
-	mysqlClient, err := db.NewMysqlClient()
+	postgresClient, err := db.NewPostgresClient()
 	if err != nil {
 		return err
 	}
-	defer mysqlClient.Close()
+	defer postgresClient.Close()
 
 	redisClient, err := db.NewRedisClient()
 	if err != nil {
@@ -28,7 +28,7 @@ func Start() error {
 
 	httpServer := &http.Server{
 		Addr:    fmt.Sprintf(":%d", config.Cfg().AppPort),
-		Handler: NewRouter(mysqlClient, redisClient),
+		Handler: NewRouter(postgresClient, redisClient),
 	}
 
 	idleConnsClosed := make(chan struct{})

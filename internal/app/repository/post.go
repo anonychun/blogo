@@ -18,27 +18,31 @@ type PostRepository interface {
 	Delete(ctx context.Context, id int64) error
 }
 
-func NewPostRepository(mysqlClient db.MysqlClient, redisClient db.RedisClient) PostRepository {
-	return &postRepository{mysqlClient, redisClient}
+func NewPostRepository(postgresClient db.PostgresClient, redisClient db.RedisClient) PostRepository {
+	return &postRepository{postgresClient, redisClient}
 }
 
 type postRepository struct {
-	mysqlClient db.MysqlClient
-	redisClient db.RedisClient
+	postgresClient db.PostgresClient
+	redisClient    db.RedisClient
 }
 
 func (r *postRepository) Create(ctx context.Context, post *model.Post) error {
-	res, err := r.mysqlClient.Conn().ExecContext(ctx, `
+	query := `
 	INSERT INTO
 		post (title, body, account_id, created_at)
 	VALUES
-		(?, ?, ?, ?)
-	`, post.Title, post.Body, post.AccountID, post.CreatedAt)
-	if err != nil {
-		return err
-	}
+		($1, $2, $3, $4)
+	RETURNING
+		id`
 
-	post.ID, err = res.LastInsertId()
+	err := r.postgresClient.Conn().QueryRow(ctx, query,
+		post.Title,
+		post.Body,
+		post.AccountID,
+		post.CreatedAt,
+	).Scan(
+		&post.ID)
 	if err != nil {
 		return err
 	}
@@ -49,33 +53,54 @@ func (r *postRepository) Create(ctx context.Context, post *model.Post) error {
 }
 
 func (r *postRepository) List(ctx context.Context, limit, offset int, title string) ([]*model.Post, error) {
-	var posts []*model.Post
-	rows, err := r.mysqlClient.Conn().QueryContext(ctx, `
+	query := `
 	SELECT
-		post.id, post.title, post.body, post.created_at, post.updated_at, post.account_id,
-		account.id, account.name, account.email, account.password, account.created_at, account.updated_at
+		post.id,
+		post.title,
+		post.body,
+		post.created_at,
+		post.updated_at,
+		post.account_id,
+		account.id,
+		account.name,
+		account.email,
+		account.password,
+		account.created_at,
+		account.updated_at
 	FROM
 		post
 	INNER JOIN
-		account
-	ON
-		post.account_id = account.id
+		account	ON post.account_id = account.id
 	WHERE
-		post.title LIKE ?
+		post.title LIKE $1
 	LIMIT
-		? OFFSET ?
-	`, "%"+title+"%", limit, offset)
+		$2 OFFSET $3`
+
+	rows, err := r.postgresClient.Conn().Query(ctx, query,
+		"%"+title+"%",
+		limit,
+		offset)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
 
+	var posts []*model.Post
 	for rows.Next() {
 		post := new(model.Post)
 		err := rows.Scan(
-			&post.ID, &post.Title, &post.Body, &post.CreatedAt, &post.UpdatedAt, &post.AccountID,
-			&post.Account.ID, &post.Account.Name, &post.Account.Email, &post.Account.Password, &post.Account.CreatedAt, &post.Account.UpdatedAt,
-		)
+			&post.ID,
+			&post.Title,
+			&post.Body,
+			&post.CreatedAt,
+			&post.UpdatedAt,
+			&post.AccountID,
+			&post.Account.ID,
+			&post.Account.Name,
+			&post.Account.Email,
+			&post.Account.Password,
+			&post.Account.CreatedAt,
+			&post.Account.UpdatedAt)
 		if err != nil {
 			return nil, err
 		}
@@ -94,10 +119,20 @@ func (r *postRepository) Get(ctx context.Context, id int64) (*model.Post, error)
 		return post, nil
 	}
 
-	err = r.mysqlClient.Conn().QueryRowContext(ctx, `
+	query := `
 	SELECT
-		post.id, post.title, post.body, post.created_at, post.updated_at, post.account_id,
-		account.id, account.name, account.email, account.password, account.created_at, account.updated_at
+		post.id,
+		post.title,
+		post.body,
+		post.created_at,
+		post.updated_at,
+		post.account_id,
+		account.id,
+		account.name,
+		account.email,
+		account.password,
+		account.created_at,
+		account.updated_at
 	FROM
 		post
 	INNER JOIN
@@ -105,12 +140,21 @@ func (r *postRepository) Get(ctx context.Context, id int64) (*model.Post, error)
 	ON
 		post.account_id = account.id
 	WHERE
-		post.id = ?
-	`, id,
-	).Scan(
-		&post.ID, &post.Title, &post.Body, &post.CreatedAt, &post.UpdatedAt, &post.AccountID,
-		&post.Account.ID, &post.Account.Name, &post.Account.Email, &post.Account.Password, &post.Account.CreatedAt, &post.Account.UpdatedAt,
-	)
+		post.id = $1`
+
+	err = r.postgresClient.Conn().QueryRow(ctx, query, id).Scan(
+		&post.ID,
+		&post.Title,
+		&post.Body,
+		&post.CreatedAt,
+		&post.UpdatedAt,
+		&post.AccountID,
+		&post.Account.ID,
+		&post.Account.Name,
+		&post.Account.Email,
+		&post.Account.Password,
+		&post.Account.CreatedAt,
+		&post.Account.UpdatedAt)
 	if err != nil {
 		return nil, err
 	}
@@ -124,14 +168,19 @@ func (r *postRepository) Get(ctx context.Context, id int64) (*model.Post, error)
 }
 
 func (r *postRepository) Update(ctx context.Context, post *model.Post) error {
-	_, err := r.mysqlClient.Conn().ExecContext(ctx, `
+	query := `
 	UPDATE
 		post
 	SET
-		title = ?, body = ?, updated_at = ?
+		title = $1, body = $2, updated_at = $3
 	WHERE
-		id = ?
-	`, post.Title, post.Body, post.UpdatedAt.Time, post.ID)
+		id = $4`
+
+	_, err := r.postgresClient.Conn().Exec(ctx, query,
+		post.Title,
+		post.Body,
+		post.UpdatedAt.Time,
+		post.ID)
 	if err != nil {
 		return err
 	}
@@ -147,12 +196,13 @@ func (r *postRepository) Update(ctx context.Context, post *model.Post) error {
 }
 
 func (r *postRepository) Delete(ctx context.Context, id int64) error {
-	_, err := r.mysqlClient.Conn().ExecContext(ctx, `
+	query := `
 	DELETE FROM
 		post
 	WHERE
-		id = ?
-	`, id)
+		id = $1`
+
+	_, err := r.postgresClient.Conn().Exec(ctx, query, id)
 	if err != nil {
 		return err
 	}

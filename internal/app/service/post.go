@@ -2,7 +2,6 @@ package service
 
 import (
 	"context"
-	"database/sql"
 	"time"
 
 	"github.com/anonychun/go-blog-api/internal/app/model"
@@ -10,6 +9,7 @@ import (
 	"github.com/anonychun/go-blog-api/internal/constant"
 	"github.com/anonychun/go-blog-api/internal/logger"
 	"github.com/anonychun/go-blog-api/internal/security/middleware"
+	pgx "github.com/jackc/pgx/v4"
 )
 
 type PostService interface {
@@ -65,7 +65,7 @@ func (s *postService) Get(ctx context.Context, req model.PostGetRequest) (*model
 	if err != nil {
 		logger.Log().Err(err).Msg("failed to get post")
 		switch err {
-		case sql.ErrNoRows:
+		case pgx.ErrNoRows:
 			return nil, constant.ErrPostNotFound
 		default:
 			return nil, constant.ErrServer
@@ -80,7 +80,7 @@ func (s *postService) Update(ctx context.Context, req model.PostUpdateRequest) (
 	if err != nil {
 		logger.Log().Err(err).Msg("failed to get post")
 		switch err {
-		case sql.ErrNoRows:
+		case pgx.ErrNoRows:
 			return nil, constant.ErrPostNotFound
 		default:
 			return nil, constant.ErrServer
@@ -99,7 +99,7 @@ func (s *postService) Update(ctx context.Context, req model.PostUpdateRequest) (
 	if err != nil {
 		logger.Log().Err(err).Msg("failed to update post")
 		switch err {
-		case sql.ErrNoRows:
+		case pgx.ErrNoRows:
 			return nil, constant.ErrPostNotFound
 		default:
 			return nil, constant.ErrServer
@@ -114,7 +114,7 @@ func (s *postService) Delete(ctx context.Context, req model.PostDeleteRequest) e
 	if err != nil {
 		logger.Log().Err(err).Msg("failed to get post")
 		switch err {
-		case sql.ErrNoRows:
+		case pgx.ErrNoRows:
 			return constant.ErrPostNotFound
 		default:
 			return constant.ErrServer

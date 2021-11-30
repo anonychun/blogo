@@ -2,7 +2,6 @@ package service
 
 import (
 	"context"
-	"database/sql"
 	"time"
 
 	"github.com/anonychun/go-blog-api/internal/app/model"
@@ -10,6 +9,7 @@ import (
 	"github.com/anonychun/go-blog-api/internal/constant"
 	"github.com/anonychun/go-blog-api/internal/logger"
 	"github.com/anonychun/go-blog-api/internal/security/middleware"
+	pgx "github.com/jackc/pgx/v4"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -32,7 +32,7 @@ type accountService struct {
 
 func (s *accountService) Create(ctx context.Context, req model.AccountCreateRequest) (*model.AccountResponse, error) {
 	_, err := s.accountRepository.GetByEmail(ctx, req.Email)
-	if err != nil && err != sql.ErrNoRows {
+	if err != nil && err != pgx.ErrNoRows {
 		logger.Log().Err(err).Msg("failed to get account by email")
 		return nil, constant.ErrServer
 	} else if err == nil {
@@ -76,7 +76,7 @@ func (s *accountService) Get(ctx context.Context, req model.AccountGetRequest) (
 	if err != nil {
 		logger.Log().Err(err).Msg("failed to get account by id")
 		switch err {
-		case sql.ErrNoRows:
+		case pgx.ErrNoRows:
 			return nil, constant.ErrAccountNotFound
 		default:
 			return nil, constant.ErrServer
@@ -92,7 +92,7 @@ func (s *accountService) Update(ctx context.Context, req model.AccountUpdateRequ
 	}
 
 	account, err := s.accountRepository.GetByEmail(ctx, req.Email)
-	if err != nil && err != sql.ErrNoRows {
+	if err != nil && err != pgx.ErrNoRows {
 		logger.Log().Err(err).Msg("failed to get account by email")
 		return nil, constant.ErrServer
 	} else if err == nil && account.ID != req.ID {
@@ -103,7 +103,7 @@ func (s *accountService) Update(ctx context.Context, req model.AccountUpdateRequ
 	if err != nil {
 		logger.Log().Err(err).Msg("failed to get account by id")
 		switch err {
-		case sql.ErrNoRows:
+		case pgx.ErrNoRows:
 			return nil, constant.ErrAccountNotFound
 		default:
 			return nil, constant.ErrServer
@@ -132,7 +132,7 @@ func (s *accountService) UpdatePassword(ctx context.Context, req model.AccountPa
 	if err != nil {
 		logger.Log().Err(err).Msg("failed to get account by id")
 		switch err {
-		case sql.ErrNoRows:
+		case pgx.ErrNoRows:
 			return nil, constant.ErrAccountNotFound
 		default:
 			return nil, constant.ErrServer

@@ -1,19 +1,18 @@
 version: "3.8"
 
 services:
-  mysql:
-    image: mysql:latest
-    container_name: mysql
+  postgres:
+    image: postgres:latest
+    container_name: postgres
     volumes:
-      - mysql:/var/lib/mysql
+      - postgres:/var/lib/postgres
     restart: always
     ports:
-      - "${MYSQL_PORT}:3306"
+      - "${POSTGRES_PORT}:5432"
     environment:
-      MYSQL_DATABASE: ${MYSQL_DATABASE}
-      MYSQL_USER: ${MYSQL_USER}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
-      MYSQL_ROOT_PASSWORD: ${MYSQL_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DATABASE}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
 
   redis:
     image: redis:latest
@@ -23,8 +22,8 @@ services:
     restart: always
     ports:
       - "${REDIS_PORT}:6379"
-    command: ["redis-server", "--requirepass", "${REDIS_PASSWORD}"]
+    command: [ "redis-server", "--requirepass", "${REDIS_PASSWORD}" ]
 
 volumes:
-  mysql: {}
+  postgres: {}
   redis: {}

@@ -10,9 +10,9 @@ require (
 	github.com/go-playground/validator v9.31.0+incompatible
 	github.com/go-redis/cache/v8 v8.4.0
 	github.com/go-redis/redis/v8 v8.8.2
-	github.com/go-sql-driver/mysql v1.6.0
 	github.com/golang-jwt/jwt v3.2.1+incompatible
 	github.com/golang-migrate/migrate/v4 v4.14.1
+	github.com/jackc/pgx/v4 v4.14.1
 	github.com/leodido/go-urn v1.2.1 // indirect
 	github.com/rs/zerolog v1.21.0
 	github.com/spf13/viper v1.7.1
@@ -20,6 +20,7 @@ require (
 	github.com/swaggo/http-swagger v1.0.0
 	github.com/swaggo/swag v1.7.0
 	github.com/urfave/cli/v2 v2.3.0
-	golang.org/x/crypto v0.0.0-20210506145944-38f3c27a63bf
+	golang.org/x/crypto v0.0.0-20211117183948-ae814b36b871
+	golang.org/x/text v0.3.7 // indirect
 	gopkg.in/go-playground/assert.v1 v1.2.1 // indirect
 )

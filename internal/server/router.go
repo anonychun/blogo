@@ -25,7 +25,7 @@ import (
 // @securityDefinitions.apikey ApiKeyAuth
 // @in header
 // @name X-API-Key
-func NewRouter(mysqlClient db.MysqlClient, redisClient db.RedisClient) *chi.Mux {
+func NewRouter(postgresClient db.PostgresClient, redisClient db.RedisClient) *chi.Mux {
 	router := chi.NewRouter()
 
 	router.Use(httprate.LimitByIP(
@@ -36,8 +36,8 @@ func NewRouter(mysqlClient db.MysqlClient, redisClient db.RedisClient) *chi.Mux 
 	router.Use(chimiddleware.Logger)
 	router.Use(chimiddleware.Recoverer)
 
-	accountRepository := repository.NewAccountRepository(mysqlClient, redisClient)
-	postRepository := repository.NewPostRepository(mysqlClient, redisClient)
+	accountRepository := repository.NewAccountRepository(postgresClient, redisClient)
+	postRepository := repository.NewPostRepository(postgresClient, redisClient)
 
 	authService := service.NewAuthService(accountRepository)
 	accountService := service.NewAccountService(accountRepository)

@@ -12,11 +12,11 @@ import (
 func load() (*migrate.Migrate, error) {
 	sourceURL := "file://migrations"
 	databaseURL := fmt.Sprintf("postgres://%s:%s@%s:%d/%s?sslmode=disable",
-		config.Cfg().MysqlUser,
-		config.Cfg().MysqlPassword,
-		config.Cfg().MysqlHost,
-		config.Cfg().MysqlPort,
-		config.Cfg().MysqlDatabase,
+		config.Cfg().PostgresUser,
+		config.Cfg().PostgresPassword,
+		config.Cfg().PostgresHost,
+		config.Cfg().PostgresPort,
+		config.Cfg().PostgresDatabase,
 	)
 	return migrate.New(sourceURL, databaseURL)
 }
